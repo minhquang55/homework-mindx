@@ -1,14 +1,12 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Card } from "antd";
 import React, { useContext } from "react";
-import ProductContext from "../context/productContext";
+import ProductContext from "../context/product/ProductContext";
 
 const { Meta } = Card;
-
 const ProductItem = ({ product }) => {
   const { thumbnail, title, price, id } = product;
   const { handleAdd } = useContext(ProductContext);
-
   return (
     <Card
       hoverable
