@@ -32,12 +32,18 @@ const ProductProvider = ({ children }) => {
   const handleAdd = (id) => {
     let newSelectedList = [...selectedProducts];
     const selectedIndex = productList.findIndex((product) => product.id === id);
-    if (selectedIndex) {
+    if (selectedIndex > -1) {
+      const index = newSelectedList.findIndex((product) => product.id === id);
       const newAddProduct = {
         ...productList[selectedIndex],
         quantity: 1,
       };
-      newSelectedList = [...newSelectedList, newAddProduct];
+      if (index > -1) {
+        newAddProduct.quantity = newSelectedList[index].quantity + 1;
+        newSelectedList[index] = newAddProduct;
+      } else {
+        newSelectedList = [...newSelectedList, newAddProduct];
+      }
       setSelectedProducts(newSelectedList);
       saveProduct(newSelectedList);
     }
@@ -45,13 +51,23 @@ const ProductProvider = ({ children }) => {
   const saveProduct = (newSelectedList) => {
     localStorage.setItem("cartList", JSON.stringify(newSelectedList));
   };
+  const handleChangeQuantity = (e, id) => {
+    const index = selectedProducts.findIndex((item) => item.id === id);
+    if (e.target.value <= 0) return;
+    const newSelectedProducts = [...selectedProducts];
+    newSelectedProducts[index] = {
+      ...newSelectedProducts[index],
+      quantity: Number(e.target.value),
+    };
+    setSelectedProducts(newSelectedProducts);
+  };
   useEffect(() => {
     const selectedList = JSON.parse(localStorage.getItem("cartList"));
-    setSelectedProducts(selectedList || 0);
+    setSelectedProducts(selectedList || []);
   }, []);
   return (
     <ProductContext.Provider
-      value={{ selectedProducts, productList, handleAdd }}
+      value={{ selectedProducts, productList, handleAdd, handleChangeQuantity }}
     >
       {children}
     </ProductContext.Provider>

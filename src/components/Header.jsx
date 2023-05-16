@@ -1,15 +1,40 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { Badge } from "antd";
 import ProductContext from "../context/product/ProductContext";
+import CartModal from "./CartModal";
+import { useSearchParams } from "react-router-dom";
 
 const Header = () => {
-  const productContext = useContext(ProductContext);
+  let [searchParams, setSearchParams] = useSearchParams();
+  const { selectedProducts } = useContext(ProductContext);
+  const [isOpen, setIsOpen] = useState(false);
+  const getTotalQuantity = () => {
+    let total = 0;
+    selectedProducts.forEach((product) => {
+      total += product.quantity;
+    });
+    return total;
+  };
+  const handleToggleModal = (isOpen) => {
+    setIsOpen(isOpen);
+    setSearchParams({ isOpen });
+  };
+  useEffect(() => {
+    setIsOpen(JSON.parse(searchParams.get("isOpen")));
+  }, []);
   return (
     <div className="header">
-      <Badge count={productContext.selectedProducts.length} size="small">
-        <ShoppingCartOutlined style={{ fontSize: 30 }} />
+      <Badge count={getTotalQuantity()} size="small">
+        <ShoppingCartOutlined
+          style={{ fontSize: 30 }}
+          onClick={() => handleToggleModal(true)}
+        />
       </Badge>
+      <CartModal
+        isOpen={isOpen}
+        handleCancel={() => handleToggleModal(false)}
+      />
     </div>
   );
 };
