@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ProductContext from "./ProductContext";
+import { useSearchParams } from "react-router-dom";
 
 const ProductProvider = ({ children }) => {
+  let [searchParams, setSearchParams] = useSearchParams();
   const productList = [
     {
       id: 1,
@@ -29,6 +31,16 @@ const ProductProvider = ({ children }) => {
     },
   ];
   const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const handleSaveProduct = () => {
+    localStorage.setItem("cartList", JSON.stringify(selectedProducts));
+  };
+
+  const handleSetSearchParams = () => {
+    searchParams.set("selectedProducts", JSON.stringify(selectedProducts));
+    setSearchParams(searchParams);
+  };
+
   const handleAdd = (id) => {
     let newSelectedList = [...selectedProducts];
     const selectedIndex = productList.findIndex((product) => product.id === id);
@@ -45,12 +57,9 @@ const ProductProvider = ({ children }) => {
         newSelectedList = [...newSelectedList, newAddProduct];
       }
       setSelectedProducts(newSelectedList);
-      saveProduct(newSelectedList);
     }
   };
-  const saveProduct = (newSelectedList) => {
-    localStorage.setItem("cartList", JSON.stringify(newSelectedList));
-  };
+
   const handleChangeQuantity = (e, id) => {
     const index = selectedProducts.findIndex((item) => item.id === id);
     if (e.target.value <= 0) return;
@@ -61,10 +70,24 @@ const ProductProvider = ({ children }) => {
     };
     setSelectedProducts(newSelectedProducts);
   };
+
   useEffect(() => {
-    const selectedList = JSON.parse(localStorage.getItem("cartList"));
-    setSelectedProducts(selectedList || []);
+    const selectedListLocalStorage = JSON.parse(
+      localStorage.getItem("cartList")
+    );
+    const selectedListSearchParams = JSON.parse(
+      searchParams.get("selectedProducts")
+    );
+    setSelectedProducts(
+      selectedListLocalStorage || selectedListSearchParams || []
+    );
   }, []);
+
+  useEffect(() => {
+    handleSetSearchParams();
+    handleSaveProduct();
+  }, [selectedProducts]);
+
   return (
     <ProductContext.Provider
       value={{ selectedProducts, productList, handleAdd, handleChangeQuantity }}

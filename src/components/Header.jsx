@@ -18,11 +18,19 @@ const Header = () => {
   };
   const handleToggleModal = (isOpen) => {
     setIsOpen(isOpen);
-    setSearchParams({ isOpen });
+  };
+  const handleSetIsOpen = () => {
+    searchParams.set("isOpen", isOpen);
+    setSearchParams(searchParams);
   };
   useEffect(() => {
     setIsOpen(JSON.parse(searchParams.get("isOpen")));
   }, []);
+
+  useEffect(() => {
+    handleSetIsOpen();
+  }, [isOpen])
+  
   return (
     <div className="header">
       <Badge count={getTotalQuantity()} size="small">
