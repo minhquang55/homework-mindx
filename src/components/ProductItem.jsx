@@ -1,7 +1,7 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Card } from "antd";
 import React, { useContext } from "react";
-import ProductContext from "../context/productContext";
+import ProductContext from "../context/product/productContext";
 
 const { Meta } = Card;
 
